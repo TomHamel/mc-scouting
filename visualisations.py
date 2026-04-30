@@ -10,7 +10,7 @@ import plotly.graph_objects as go
 # RADAR — BRUT vs AJUSTÉ
 # ============================================================
 
-DIMENSIONS_RADAR = [
+DIMENSIONS_RADAR_FR = [
     ("Défense",       "actions_def_90",     "actions_def_90_adj_pct"),
     ("Duels déf.",    "duels_def_90",       "duels_def_90_adj_pct"),
     ("Tacles",        "tacles_padj",        "tacles_padj_adj_pct"),
@@ -23,7 +23,21 @@ DIMENSIONS_RADAR = [
     ("xA",            "xa_90",              "xa_90_pct"),
 ]
 
+DIMENSIONS_RADAR_ES = [
+    ("Defensa",        "actions_def_90",     "actions_def_90_adj_pct"),
+    ("Duelos déf.",    "duels_def_90",       "duels_def_90_adj_pct"),
+    ("Tacles",         "tacles_padj",        "tacles_padj_adj_pct"),
+    ("Intercepciones", "interceptions_padj", "interceptions_padj_adj_pct"),
+    ("Pases prog.",    "passes_prog_90",     "passes_prog_90_adj_pct"),
+    ("Pases %",        "passes_pct",         "passes_pct_adj_pct"),
+    ("Pases av.",      "passes_avant_90",    "passes_avant_90_adj_pct"),
+    ("Carreras prog.", "courses_prog_90",    "courses_prog_90_adj_pct"),
+    ("xG",             "xg_90",              "xg_90_pct"),
+    ("xA",             "xa_90",              "xa_90_pct"),
+]
+
 def radar_joueur(nom, df_final, df_players_norm=None, lang="fr"):
+    DIMENSIONS_RADAR = DIMENSIONS_RADAR_FR if lang == "fr" else DIMENSIONS_RADAR_ES
     row = df_final[df_final["joueur"] == nom]
     if row.empty:
         return None
