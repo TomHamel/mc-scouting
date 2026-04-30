@@ -23,7 +23,7 @@ DIMENSIONS_RADAR = [
     ("xA",            "xa_90",              "xa_90_pct"),
 ]
 
-def radar_joueur(nom, df_final, df_players_norm=None):
+def radar_joueur(nom, df_final, df_players_norm=None, lang="fr"):
     row = df_final[df_final["joueur"] == nom]
     if row.empty:
         return None
@@ -74,39 +74,42 @@ def radar_joueur(nom, df_final, df_players_norm=None):
                  linewidth=1.5, alpha=0.3, transform=ax_info.transAxes)
 
     # Contexte équipe
-    ax_info.text(0.05, 0.75, "CONTEXTE ÉQUIPE",
+    ax_info.text(0.05, 0.75,
+                 "CONTEXTE ÉQUIPE" if lang == "fr" else "CONTEXTO EQUIPO",
                  fontsize=10, fontweight="bold", color="#2c3e50",
                  transform=ax_info.transAxes, va="top")
 
     ctx_descriptions = {
         "label_bloc": {
-            "Bloc haut":   "Récupère haut — pressing dans le camp adverse",
-            "Bloc médian": "Récupère en zone médiane",
-            "Bloc bas":    "Récupère bas — défend dans son camp",
+            "Bloc haut":   "Récupère haut — pressing dans le camp adverse" if lang == "fr" else "Recupera alto — pressing en campo rival",
+            "Bloc médian": "Récupère en zone médiane" if lang == "fr" else "Recupera en zona media",
+            "Bloc bas":    "Récupère bas — défend dans son camp" if lang == "fr" else "Recupera bajo — defiende en su campo",
         },
         "label_pressing": {
-            "Pressing intensif": "Presse intensément après perte de balle",
-            "Pressing modéré":   "Pressing modéré — équipe équilibrée",
-            "Bloc passif":       "Peu de pressing — équipe passive défensivement",
+            "Pressing intensif": "Presse intensément après perte de balle" if lang == "fr" else "Presiona intensamente tras pérdida",
+            "Pressing modéré":   "Pressing modéré — équipe équilibrée" if lang == "fr" else "Pressing moderado — equipo equilibrado",
+            "Bloc passif":       "Peu de pressing — équipe passive défensivement" if lang == "fr" else "Poco pressing — equipo pasivo defensivamente",
         },
         "label_avec_ballon": {
-            "Possession": "Jeu de possession — construction élaborée",
-            "Équilibré":  "Style de jeu équilibré",
-            "Jeu direct": "Jeu direct — peu de construction depuis l'arrière",
+            "Possession": "Jeu de possession — construction élaborée" if lang == "fr" else "Juego de posesión — construcción elaborada",
+            "Équilibré":  "Style de jeu équilibré" if lang == "fr" else "Estilo de juego equilibrado",
+            "Jeu direct": "Jeu direct — peu de construction depuis l'arrière" if lang == "fr" else "Juego directo — poca construcción desde atrás",
         },
         "label_transition_off": {
-            "Contre-attaque": "Équipe qui cherche à contre-attaquer",
-            "Mixte":          "Transitions offensives modérées",
-            "Jeu placé":      "Peu de transitions — attaque en bloc organisé",
+            "Contre-attaque": "Équipe qui cherche à contre-attaquer" if lang == "fr" else "Equipo que busca el contraataque",
+            "Mixte":          "Transitions offensives modérées" if lang == "fr" else "Transiciones ofensivas moderadas",
+            "Jeu placé":      "Peu de transitions — attaque en bloc organisé" if lang == "fr" else "Pocas transiciones — ataque en bloque organizado",
         },
     }
 
-    for i, (label, label_col) in enumerate([
+    ctx_labels = [
         ("Bloc",        "label_bloc"),
         ("Pressing",    "label_pressing"),
-        ("Avec ballon", "label_avec_ballon"),
+        ("Avec ballon" if lang == "fr" else "Con balón", "label_avec_ballon"),
         ("Transition",  "label_transition_off"),
-    ]):
+    ]
+
+    for i, (label, label_col) in enumerate(ctx_labels):
         y = 0.69 - i * 0.065
         val         = j[label_col] if label_col in j and pd.notna(j[label_col]) else "—"
         description = ctx_descriptions.get(label_col, {}).get(val, val)
@@ -123,9 +126,10 @@ def radar_joueur(nom, df_final, df_players_norm=None):
     # Impact contexte
     impact = round(j["impact_contexte"] * 100, 1)
     color  = "#27ae60" if impact >= 0 else "#e74c3c"
-    label  = "sous-coté par son système" if impact >= 0 else "favorisé par son système"
+    label  = ("sous-coté par son système" if impact >= 0 else "favorisé par son système") if lang == "fr" else ("infravalorado por su sistema" if impact >= 0 else "favorecido por su sistema")
 
-    ax_info.text(0.05, 0.40, "IMPACT CONTEXTE",
+    ax_info.text(0.05, 0.40,
+                 "IMPACT CONTEXTE" if lang == "fr" else "IMPACTO CONTEXTO",
                  fontsize=10, fontweight="bold", color="#2c3e50",
                  transform=ax_info.transAxes, va="top")
     ax_info.text(0.05, 0.33, f"{impact:+.1f}%  —  {label}",
@@ -136,17 +140,19 @@ def radar_joueur(nom, df_final, df_players_norm=None):
                  linewidth=1.5, alpha=0.3, transform=ax_info.transAxes)
 
     # Scores profils
-    ax_info.text(0.05, 0.23, "SCORES PROFILS MC",
+    ax_info.text(0.05, 0.23,
+                 "SCORES PROFILS MC" if lang == "fr" else "PUNTUACIONES PERFILES MC",
                  fontsize=10, fontweight="bold", color="#2c3e50",
                  transform=ax_info.transAxes, va="top")
 
-    for i, (label, col) in enumerate([
-        ("Récupérateur", "score_mc_recuperateur"),
-        ("Relanceur",    "score_mc_relanceur"),
-        ("Box to Box",   "score_mc_boxtbox"),
-        ("Intérieur",    "score_mc_interieur"),
-        ("Offensif",     "score_mc_offensif"),
-    ]):
+    profil_labels = [
+        ("Récupérateur" if lang == "fr" else "Recuperador", "score_mc_recuperateur"),
+        ("Relanceur"    if lang == "fr" else "Relanzador",   "score_mc_relanceur"),
+        ("Box to Box",                                        "score_mc_boxtbox"),
+        ("Intérieur"    if lang == "fr" else "Interior",     "score_mc_interieur"),
+        ("Offensif"     if lang == "fr" else "Ofensivo",     "score_mc_offensif"),
+    ]
+    for i, (label, col) in enumerate(profil_labels):
         y     = 0.19 - i * 0.044
         score = round(j[col], 1) if col in j and pd.notna(j[col]) else 0
         color = "#2ecc71" if score >= 66 else "#f39c12" if score >= 33 else "#e74c3c"
@@ -188,20 +194,22 @@ def radar_joueur(nom, df_final, df_players_norm=None):
                       fontweight="bold", color="#2c3e50")
 
     ax_radar.set_title(
-        f"Profil MC contextualisé\nScore moyen ajusté : {score_moy}/100",
+        f"{'Profil MC contextualisé' if lang == 'fr' else 'Perfil MC contextualizado'}\n"
+        f"{'Score moyen ajusté' if lang == 'fr' else 'Puntuación media ajustada'} : {score_moy}/100",
         fontsize=11, fontweight="bold", pad=15)
 
     patch_brut = mpatches.Patch(color="#95a5a6", alpha=0.7,
-                                 label="Brut (intra-ligue)")
+                                 label="Brut (intra-ligue)" if lang == "fr" else "Bruto (intra-liga)")
     patch_adj  = mpatches.Patch(color="#2c3e50", alpha=0.7,
-                                 label="Ajusté (inter-ligues)")
+                                 label="Ajusté (inter-ligues)" if lang == "fr" else "Ajustado (inter-ligas)")
     ax_radar.legend(handles=[patch_brut, patch_adj],
                     loc="upper right", bbox_to_anchor=(1.3, 1.15),
                     fontsize=9)
 
-    fig.text(0.98, 0.01, "Data : Hudl Wyscout | Scouting contextuel MC",
+    fig.text(0.98, 0.01,
+             "Data : Hudl Wyscout | Scouting contextuel MC" if lang == "fr" else "Data : Hudl Wyscout | Scouting contextual MC",
              ha="right", fontsize=8, alpha=0.6)
-    plt.suptitle(f"Rapport Scouting — {nom}",
+    plt.suptitle(f"{'Rapport Scouting' if lang == 'fr' else 'Informe Scouting'} — {nom}",
                  fontsize=14, fontweight="bold", y=1.02)
 
     return fig
@@ -213,7 +221,8 @@ def radar_joueur(nom, df_final, df_players_norm=None):
 
 def cartographie_mc(df, profil_x="score_mc_recuperateur",
                     profil_y="score_mc_relanceur",
-                    label_x="Récupérateur", label_y="Relanceur"):
+                    label_x="Récupérateur", label_y="Relanceur",
+                    lang="fr"):
 
     couleurs = {
         "L1":       "#2c3e50",
@@ -230,12 +239,16 @@ def cartographie_mc(df, profil_x="score_mc_recuperateur",
     for ligue in sorted(df["ligue"].dropna().unique()):
         sub = df[df["ligue"] == ligue]
 
+        age_label     = "Âge" if lang == "fr" else "Edad"
+        minutes_label = "Minutes" if lang == "fr" else "Minutos"
+        impact_label  = "Impact contexte" if lang == "fr" else "Impacto contexto"
+
         hover = (
             "<b>" + sub["joueur"] + "</b><br>" +
             sub["equipe_norm"] + " · " + sub["ligue"] + "<br>" +
-            "Âge : " + sub["age"].astype(str) + "<br>" +
-            "Minutes : " + sub["minutes"].astype(int).astype(str) + "<br>" +
-            "Impact contexte : " +
+            age_label + " : " + sub["age"].astype(str) + "<br>" +
+            minutes_label + " : " + sub["minutes"].astype(int).astype(str) + "<br>" +
+            impact_label + " : " +
             (sub["impact_contexte"] * 100).round(1).astype(str) + "%<br>" +
             label_x + " : " + sub[profil_x].round(1).astype(str) + "<br>" +
             label_y + " : " + sub[profil_y].round(1).astype(str)
@@ -258,32 +271,38 @@ def cartographie_mc(df, profil_x="score_mc_recuperateur",
     fig.add_hline(y=50, line_dash="dash", line_color="grey", opacity=0.4)
     fig.add_vline(x=50, line_dash="dash", line_color="grey", opacity=0.4)
 
-    # Labels quadrants dynamiques
+    fort  = "Fort"   if lang == "fr" else "Alto"
+    faible = "Faible" if lang == "fr" else "Bajo"
+    profil_limite = "Profil limité" if lang == "fr" else "Perfil limitado"
+
     fig.add_annotation(x=12, y=95,
-        text=f"Fort {label_y}<br>Faible {label_x}",
+        text=f"{fort} {label_y}<br>{faible} {label_x}",
         showarrow=False,
         font=dict(size=10, color="grey"), opacity=0.6)
 
     fig.add_annotation(x=85, y=95,
-        text=f"Fort {label_x}<br>+ Fort {label_y}",
+        text=f"{fort} {label_x}<br>+ {fort} {label_y}",
         showarrow=False,
         font=dict(size=10, color="#27ae60"), opacity=0.9)
 
     fig.add_annotation(x=12, y=5,
-        text="Profil limité",
+        text=profil_limite,
         showarrow=False,
         font=dict(size=10, color="grey"), opacity=0.6)
 
     fig.add_annotation(x=85, y=5,
-        text=f"Fort {label_x}<br>Faible {label_y}",
+        text=f"{fort} {label_x}<br>{faible} {label_y}",
         showarrow=False,
         font=dict(size=10, color="grey"), opacity=0.6)
 
+    taille_label = "Taille = minutes jouées" if lang == "fr" else "Tamaño = minutos jugados"
+    carto_title  = "Cartographie MC" if lang == "fr" else "Cartografía MC"
+    ligue_label  = "Ligue" if lang == "fr" else "Liga"
+
     fig.update_layout(
         title=dict(
-            text=f"Cartographie MC — {label_x} vs {label_y}<br>"
-                 "<sup>L1 · L2 · Liga · Liga Segunda 2025/2026 — "
-                 "Taille = minutes jouées</sup>",
+            text=f"{carto_title} — {label_x} vs {label_y}<br>"
+                 f"<sup>L1 · L2 · Liga · Liga Segunda 2025/2026 — {taille_label}</sup>",
             font=dict(size=15)
         ),
         xaxis=dict(title=f"← {label_x} →", range=[0, 100],
@@ -292,18 +311,20 @@ def cartographie_mc(df, profil_x="score_mc_recuperateur",
                    showgrid=True, gridcolor="#eeeeee"),
         plot_bgcolor="#f8f9fa",
         paper_bgcolor="#f8f9fa",
-        legend=dict(title="Ligue"),
+        legend=dict(title=ligue_label),
         height=650,
         hovermode="closest",
         font=dict(family="Arial")
     )
 
     return fig
-    # ============================================================
+
+
+# ============================================================
 # PIZZA CHART — PROFIL MC COMPLET
 # ============================================================
 
-def pizza_chart(nom, df_final):
+def pizza_chart(nom, df_final, lang="fr"):
     row = df_final[df_final["joueur"] == nom]
     if row.empty:
         return None
@@ -386,16 +407,18 @@ def pizza_chart(nom, df_final):
     ax_info.plot([0, 1], [0.83, 0.83], color="#2c3e50",
                  linewidth=1, alpha=0.3, transform=ax_info.transAxes)
 
-    ax_info.text(0.0, 0.80, "DIMENSIONS",
+    ax_info.text(0.0, 0.80,
+                 "DIMENSIONS" if lang == "fr" else "DIMENSIONES",
                  fontsize=9, fontweight="bold", color="#2c3e50",
                  transform=ax_info.transAxes, va="top")
 
-    for i, (color, label) in enumerate([
-        ("#e74c3c", "Défense"),
-        ("#3498db", "Passes"),
-        ("#2ecc71", "Transition"),
-        ("#f39c12", "Offensif"),
-    ]):
+    dim_labels = [
+        ("#e74c3c", "Défense"    if lang == "fr" else "Defensa"),
+        ("#3498db", "Passes"     if lang == "fr" else "Pases"),
+        ("#2ecc71", "Transition" if lang == "fr" else "Transición"),
+        ("#f39c12", "Offensif"   if lang == "fr" else "Ofensivo"),
+    ]
+    for i, (color, label) in enumerate(dim_labels):
         y = 0.74 - i * 0.07
         ax_info.add_patch(plt.Rectangle(
             (0.0, y - 0.015), 0.08, 0.04,
@@ -407,17 +430,19 @@ def pizza_chart(nom, df_final):
     ax_info.plot([0, 1], [0.43, 0.43], color="#2c3e50",
                  linewidth=1, alpha=0.3, transform=ax_info.transAxes)
 
-    ax_info.text(0.0, 0.40, "SCORES PROFILS",
+    ax_info.text(0.0, 0.40,
+                 "SCORES PROFILS" if lang == "fr" else "PUNTUACIONES PERFILES",
                  fontsize=9, fontweight="bold", color="#2c3e50",
                  transform=ax_info.transAxes, va="top")
 
-    for i, (label, col, color) in enumerate([
-        ("Récupérateur", "score_mc_recuperateur", "#e74c3c"),
-        ("Relanceur",    "score_mc_relanceur",    "#3498db"),
-        ("Box to Box",   "score_mc_boxtbox",      "#2ecc71"),
-        ("Intérieur",    "score_mc_interieur",    "#9b59b6"),
-        ("Offensif",     "score_mc_offensif",     "#f39c12"),
-    ]):
+    pizza_profils = [
+        ("Récupérateur" if lang == "fr" else "Recuperador", "score_mc_recuperateur", "#e74c3c"),
+        ("Relanceur"    if lang == "fr" else "Relanzador",   "score_mc_relanceur",    "#3498db"),
+        ("Box to Box",                                        "score_mc_boxtbox",      "#2ecc71"),
+        ("Intérieur"    if lang == "fr" else "Interior",     "score_mc_interieur",    "#9b59b6"),
+        ("Offensif"     if lang == "fr" else "Ofensivo",     "score_mc_offensif",     "#f39c12"),
+    ]
+    for i, (label, col, color) in enumerate(pizza_profils):
         y     = 0.33 - i * 0.060
         score = round(j[col], 1) if col in j and pd.notna(j[col]) else 0
         ax_info.barh(y, score / 100 * 0.85, height=0.038,
@@ -433,13 +458,15 @@ def pizza_chart(nom, df_final):
 
     impact       = round(j["impact_contexte"] * 100, 1)
     impact_color = "#27ae60" if impact >= 0 else "#e74c3c"
-    impact_label = "sous-coté" if impact >= 0 else "favorisé"
+    impact_label = ("sous-coté" if impact >= 0 else "favorisé") if lang == "fr" else ("infravalorado" if impact >= 0 else "favorecido")
+    impact_title = "Impact contexte" if lang == "fr" else "Impacto contexto"
+
     ax_info.text(0.0, 0.03,
-                 f"Impact contexte : {impact:+.1f}% — {impact_label}",
+                 f"{impact_title} : {impact:+.1f}% — {impact_label}",
                  fontsize=8.5, color=impact_color, fontweight="bold",
                  transform=ax_info.transAxes, va="top")
 
-    fig.text(0.98, 0.01, "Data : Hudl Wyscout | Percentiles inter-ligues ajustés — L1",
-             ha="right", fontsize=8, alpha=0.6)
+    footer = "Data : Hudl Wyscout | Percentiles inter-ligues ajustés" if lang == "fr" else "Data : Hudl Wyscout | Percentiles inter-ligas ajustados"
+    fig.text(0.98, 0.01, footer, ha="right", fontsize=8, alpha=0.6)
 
     return fig
