@@ -396,7 +396,7 @@ with tab1:
         joueur_sel = st.selectbox(t["selectionne"], joueurs_dispo,
                                   key="scout_joueur")
         if joueur_sel:
-            fig = radar_joueur(joueur_sel, df_final, df_players_norm)
+            fig = radar_joueur(joueur_sel, df_final, df_players_norm, lang=lang)
             if fig:
                 st.pyplot(fig)
     else:
@@ -458,7 +458,8 @@ with tab2:
         profil_x=axe_x,
         profil_y=axe_y,
         label_x=PROFILS_LABELS[axe_x],
-        label_y=PROFILS_LABELS[axe_y]
+        label_y=PROFILS_LABELS[axe_y],
+        lang=lang
     )
     st.plotly_chart(fig_carto, use_container_width=True)
 
@@ -499,9 +500,9 @@ with tab3:
         )
 
         if viz_type == t["radar"]:
-            fig = radar_joueur(joueur_profil, df_final, df_players_norm)
+            fig = radar_joueur(joueur_profil, df_final, df_players_norm, lang=lang)
         else:
-            fig = pizza_chart(joueur_profil, df_final)
+            fig = pizza_chart(joueur_profil, df_final, lang=lang)
 
         if fig:
             st.pyplot(fig)
