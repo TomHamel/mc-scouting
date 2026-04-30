@@ -20,8 +20,11 @@ DEMO_PATH = "data/df_final_mc.csv"
 NORM_PATH = "data/df_players_norm_mc.csv"
 
 # ── Détection langue via URL ──────────────────────────────
-params = st.query_params
-lang = params.get("lang", "fr").lower()
+try:
+    params = st.query_params
+    lang = params.get("lang", "fr").lower()
+except:
+    lang = "fr"
 if lang not in ["fr", "es"]:
     lang = "fr"
 
